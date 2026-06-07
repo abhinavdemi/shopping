@@ -5,6 +5,7 @@ import { ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { addToCart } from "@/app/cart/actions";
 import { createClient } from "@/lib/supabase/server";
 import { formatPrice } from "@/lib/format";
 import type { Category, Product } from "@/lib/types";
@@ -102,11 +103,18 @@ export default async function ProductPage({
             </p>
           )}
 
-          <div className="mt-2">
-            <Button size="lg" className="w-full sm:w-auto sm:px-12" disabled={product.stock === 0}>
+          <form action={addToCart} className="mt-2">
+            <input type="hidden" name="productId" value={product.id} />
+            <input type="hidden" name="redirectTo" value={`/products/${product.slug}`} />
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full sm:w-auto sm:px-12"
+              disabled={product.stock === 0}
+            >
               Add to cart
             </Button>
-          </div>
+          </form>
         </div>
       </div>
     </div>

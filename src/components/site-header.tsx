@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ShoppingCart, Search, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +27,16 @@ export async function SiteHeader() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
+
+  let cartCount = 0;
+  if (claims?.sub) {
+    const { data: cartItems } = await supabase
+      .from("cart_items")
+      .select("quantity")
+      .eq("user_id", claims.sub)
+      .returns<{ quantity: number }[]>();
+    cartCount = cartItems?.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -80,9 +90,18 @@ export async function SiteHeader() {
               Sign in
             </Link>
           )}
-          <Button variant="ghost" size="icon" aria-label="Cart" className="relative">
+          <Link
+            href="/cart"
+            aria-label={`Cart${cartCount > 0 ? `, ${cartCount} items` : ""}`}
+            className={buttonVariants({ variant: "ghost", size: "icon", className: "relative" })}
+          >
             <ShoppingCart className="size-5" />
-          </Button>
+            {cartCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex size-4.5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                {cartCount > 9 ? "9+" : cartCount}
+              </span>
+            )}
+          </Link>
         </div>
       </div>
 

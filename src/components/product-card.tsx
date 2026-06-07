@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { addToCart } from "@/app/cart/actions";
 import { formatPrice } from "@/lib/format";
 import type { Product } from "@/lib/types";
 
@@ -40,9 +41,13 @@ export function ProductCard({ product }: { product: Product }) {
         )}
       </CardContent>
       <CardFooter className="bg-transparent border-t-0 pt-0">
-        <Button className="w-full" disabled={product.stock === 0}>
-          Add to cart
-        </Button>
+        <form action={addToCart} className="w-full">
+          <input type="hidden" name="productId" value={product.id} />
+          <input type="hidden" name="redirectTo" value={`/products/${product.slug}`} />
+          <Button type="submit" className="w-full" disabled={product.stock === 0}>
+            Add to cart
+          </Button>
+        </form>
       </CardFooter>
     </Card>
   );
