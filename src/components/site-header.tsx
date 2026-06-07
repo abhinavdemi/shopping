@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/products", label: "All Products" },
-  { href: "/categories/electronics", label: "Electronics" },
-  { href: "/categories/home-kitchen", label: "Home & Kitchen" },
-  { href: "/categories/books", label: "Books" },
-  { href: "/categories/fashion", label: "Fashion" },
+  { href: "/products?category=electronics", label: "Electronics" },
+  { href: "/products?category=home-kitchen", label: "Home & Kitchen" },
+  { href: "/products?category=books", label: "Books" },
+  { href: "/products?category=fashion", label: "Fashion" },
 ];
 
 export function SiteHeader() {
