@@ -1,7 +1,18 @@
 import Link from "next/link";
 import { ShoppingCart, Search, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { createClient } from "@/lib/supabase/server";
+import { signOut } from "@/app/auth/actions";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -12,7 +23,11 @@ const NAV_LINKS = [
   { href: "/products?category=fashion", label: "Fashion" },
 ];
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims;
+
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
@@ -30,9 +45,41 @@ export function SiteHeader() {
         </div>
 
         <div className="ml-auto flex items-center gap-1">
-          <Button variant="ghost" size="icon" aria-label="Account">
-            <User className="size-5" />
-          </Button>
+          {claims ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <button
+                    type="button"
+                    aria-label="Account"
+                    className={buttonVariants({ variant: "ghost", size: "icon" })}
+                  >
+                    <User className="size-5" />
+                  </button>
+                }
+              />
+              <DropdownMenuContent align="end">
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel className="truncate font-normal text-muted-foreground">
+                    {(claims.user_metadata as { full_name?: string } | undefined)
+                      ?.full_name || claims.email}
+                  </DropdownMenuLabel>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive" className="p-0">
+                  <form action={signOut} className="contents">
+                    <button type="submit" className="w-full px-1.5 py-1 text-left">
+                      Sign out
+                    </button>
+                  </form>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link href="/login" className={buttonVariants({ variant: "ghost" })}>
+              Sign in
+            </Link>
+          )}
           <Button variant="ghost" size="icon" aria-label="Cart" className="relative">
             <ShoppingCart className="size-5" />
           </Button>
